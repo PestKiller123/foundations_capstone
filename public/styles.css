@@ -1,0 +1,52 @@
+
+.pokemonContainer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+
+}
+
+.card {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin: 1.6vw;
+    width: 150px;
+    height: 200px;
+    background-color: beige;
+    border-radius: 5%;
+}
+
+.image {
+    width: fit-content;
+    height: fit-content;
+}
+
+#nav {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+h1 {
+    font-size: 5vh;
+    color: #FFDE00;
+}
+
+h2 {
+    font-size: 4.5vh;
+    color: #FFDE00;
+
+}
+
+body {
+    background-color: #3B4CCA;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.btn {
+    border-radius: 20%;
+}
