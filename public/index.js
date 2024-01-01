@@ -4,9 +4,9 @@ const previousBtn = document.getElementById('previousBtn');
 const teamContainer = document.querySelector('#team');
 let pokemonId = 1;
 let pokemonArray = [];
+const promises = [];
 
-const getPokemon = async () => {
-    const promises = [];
+const getPokemon = () => {
 
     for (let i = 0; i < 20; i++) {
         const promise = axios.get(`https://pokeapi.co/api/v2/pokemon/${pokemonId}`)
@@ -27,18 +27,19 @@ const getPokemon = async () => {
 
         promises.push(promise);
         pokemonId++;
+        // console.log(pokemonId)
     }
 
-    await Promise.all(promises);
+    return Promise.all(promises).then(() => pokemonArray);
 };
 
+// <p>Id: ${pokemon.id}</p>
 const pokemonCard = (pokemon) => {
     return `<div class='card'>
     <p>Name: ${pokemon.name}</p>
     <p>Types: ${pokemon.types.join(', ')}</p>
-    <p>Id: ${pokemon.id}</p>
     <img src='${pokemon.image}' alt='${pokemon.name}' class='image'/>
-    <button class='btn' onclick="addToTeam('${pokemon.name}', '${pokemon.id}', '${pokemon.types.join(', ')}', '${pokemon.image}')">Add</button>
+    <button class='btn' id="addBtn" onclick="addToTeam('${pokemon.name}', '${pokemon.id}', '${pokemon.types.join(', ')}', '${pokemon.image}')">Add</button>
     </div>`;
 };
 const renderPokemon = () => {
@@ -48,20 +49,28 @@ const renderPokemon = () => {
         cardsContainer.innerHTML += pokemonHtml;
     });
 };
-const showNextPokemon = async () => {
+const showNextPokemon = () => {
     pokemonArray = [];
-    await getPokemon(); // Fetch the next 20 Pokemon
-    renderPokemon(); // Render the updated Pokemon cards
-    console.log(pokemonArray)
+    getPokemon().then(() => {renderPokemon();}).catch(error => {
+        console.error('Error in showPreviousPokemon:', error);
+    });
+    // console.log(pokemonArray)
 };
 
-const showPreviousPokemon = async () => {
-    if (pokemonId > 20) {
+const showPreviousPokemon = () => {
+    if (pokemonId <= 21) {
         pokemonArray = [];
-        pokemonId -= 40; // Decrement to the previous set of 20 Pokemon
-        await getPokemon(); // Fetch the previous 20 Pokemon
-        renderPokemon(); // Render the updated Pokemon cards
-        console.log(pokemonArray)
+        pokemonId = 1
+        getPokemon().then(() => {renderPokemon();}).catch(error => {
+            console.error('Error in showPreviousPokemon:', error);
+        });
+    } else {
+        pokemonArray = [];
+        pokemonId -= 40; 
+        getPokemon().then(() => {renderPokemon();}).catch(error => {
+            console.error('Error in showPreviousPokemon:', error);
+        });
+        // console.log(pokemonArray) 
     }
 };
 
@@ -75,23 +84,23 @@ const addToTeam = async (name, id, types, image) => {
 
     try {
         const response = await axios.post('http://localhost:4004/team/', body);
-        console.log('Pokemon added successfully:', response.data);
+        // console.log('Pokemon added successfully:', response.data);
         getTeam();
     } catch (error) {
         console.error('Error adding Pokemon:', error);
     }
 };
+// <p>Id: ${elem.id}</p>
 const getTeam = () => {
     teamContainer.innerHTML = "";
     axios.get('http://localhost:4004/team/')
-        .then(res => {
-            res.data.forEach(elem => {
-                let pokemonCard = `<div class="card">
-                    <p>Name: ${elem.name}</p>
-                    <p>Types: ${elem.types}</p>
-                    <p>Id: ${elem.id}</p>
-                    <img src='${elem.image}' alt='${elem.name}' class='image'/>
-                    <button onclick="deleteCard(${elem['id']})">Delete</button>
+    .then(res => {
+        res.data.forEach(elem => {
+            let pokemonCard = `<div class="card">
+            <p>Name: ${elem.name}</p>
+            <p>Types: ${elem.types}</p>
+            <img src='${elem.image}' alt='${elem.name}' class='image'/>
+                    <button class="btn" id="deleteBtn" onclick="deleteCard(${elem['id']})">Delete</button>
                     </div>
                 `
 
